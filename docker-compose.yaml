@@ -1,0 +1,23 @@
+services:
+
+  db-cassandra:
+    image: cassandra:5.0.6
+    container_name: url-shortener-db-cassandra
+    environment:
+      CASSANDRA_USER: admin
+      CASSANDRA_PASSWORD: admin
+      CASSANDRA_DB: urlShortenerDB
+    ports:
+      - "9042:9042"
+    volumes:
+      - db-cassandra-vol:/var/lib/cassandra/data
+    networks:
+      - url-shortener-network
+
+volumes:
+  db-cassandra-vol:
+
+
+networks:
+  url-shortener-network:
+    driver: bridge
