@@ -1,9 +1,9 @@
 package es.vicfuen.url_redirect_service.service.redirect;
 
+import es.vicfuen.ccassandraCommon.entity.UrlShortenerEntity;
+import es.vicfuen.ccassandraCommon.mapper.UrlModelEntityMapper;
+import es.vicfuen.ccassandraCommon.model.UrlModel;
 import es.vicfuen.url_redirect_service.repository.UrlRedirectRepository;
-import es.vicfuen.url_redirect_service.repository.entity.UrlShortenerEntity;
-import es.vicfuen.url_redirect_service.service.mapper.UrlRedirectEntityMapper;
-import es.vicfuen.url_redirect_service.service.model.UrlModel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 public class UrlRedirectServiceImpl implements UrlRedirectService {
 
  private final UrlRedirectRepository urlRedirectRepository;
- private final UrlRedirectEntityMapper urlRedirectEntityMapper;
+ private final UrlModelEntityMapper urlModelEntityMapper;
 
  @Override
  public Optional<UrlModel> getLongUrl(String shortUrl) {
@@ -30,14 +30,14 @@ public class UrlRedirectServiceImpl implements UrlRedirectService {
     log.info("Url not found");
   }
   return urlRedirectRepository.findById(shortUrl)
-    .map(urlRedirectEntityMapper::toModel);
+    .map(urlModelEntityMapper::toModel);
  }
 
  @Override
  public List<UrlModel> getUrls() {
   log.info("Getting all urls");
   return urlRedirectRepository.findAll().stream()
-    .map(urlRedirectEntityMapper::toModel)
+    .map(urlModelEntityMapper::toModel)
     .collect(Collectors.toList());
  }
 }

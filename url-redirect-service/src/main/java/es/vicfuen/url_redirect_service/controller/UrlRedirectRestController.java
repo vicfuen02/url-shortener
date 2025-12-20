@@ -1,5 +1,7 @@
 package es.vicfuen.url_redirect_service.controller;
 
+import es.vicfuen.ccassandraCommon.dto.UrlShortenerResDto;
+import es.vicfuen.ccassandraCommon.mapper.UrlModelRestMapper;
 import lombok.extern.slf4j.Slf4j;
 import lombok.RequiredArgsConstructor;
 
@@ -13,9 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import es.vicfuen.url_redirect_service.controller.dto.UrlReqDto;
 import es.vicfuen.url_redirect_service.service.redirect.UrlRedirectService;
-import es.vicfuen.url_redirect_service.controller.mapper.UrlRedirectMapper;
 
 @Slf4j
 @RestController
@@ -24,7 +24,7 @@ import es.vicfuen.url_redirect_service.controller.mapper.UrlRedirectMapper;
 public class UrlRedirectRestController {
 
     private final UrlRedirectService urlRedirectService;
-    private final UrlRedirectMapper urlRedirectMapper;
+    private final UrlModelRestMapper urlModelRestMapper;
 
     @GetMapping("/{shortUrl}")
     public ResponseEntity<?> getLongUrl(@PathVariable String shortUrl) {
@@ -38,8 +38,8 @@ public class UrlRedirectRestController {
     }
 
     @GetMapping
-    public List<UrlReqDto> getUrls() {
-        return urlRedirectMapper.toDtoList(
+    public List<UrlShortenerResDto> getUrls() {
+        return urlModelRestMapper.toDtoList(
                 urlRedirectService.getUrls());
     }
 

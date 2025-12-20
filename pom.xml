@@ -19,6 +19,7 @@
 	<modules>
 		<module>url-shortening-service</module>
 		<module>url-redirect-service</module>
+		<module>url-shortener-cassandra-common</module>
 	</modules>
 
 	<description>URL Shortener application</description>
