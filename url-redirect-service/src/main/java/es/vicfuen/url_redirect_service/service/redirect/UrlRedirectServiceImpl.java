@@ -6,6 +6,7 @@ import es.vicfuen.ccassandraCommon.model.UrlModel;
 import es.vicfuen.url_redirect_service.repository.UrlRedirectRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,6 +22,7 @@ public class UrlRedirectServiceImpl implements UrlRedirectService {
  private final UrlModelEntityMapper urlModelEntityMapper;
 
  @Override
+ @Cacheable(value="getLongUrl", key="#shortUrl")
  public Optional<UrlModel> getLongUrl(String shortUrl) {
   log.info("Getting long url for short url: {}", shortUrl);
   Optional<UrlShortenerEntity> url = urlRedirectRepository.findById(shortUrl);
