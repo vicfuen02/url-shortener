@@ -15,7 +15,14 @@
 	<description>URL Cassandra Common</description>
 
 	<dependencies>
-         <!-- Dependencies are inherited from parent, but we can verify imports work later -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-webmvc</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-cassandra</artifactId>
+		</dependency>
 	</dependencies>
 
 	<build>

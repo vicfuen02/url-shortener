@@ -19,7 +19,7 @@ import es.vicfuen.url_redirect_service.service.redirect.UrlRedirectService;
 
 @Slf4j
 @RestController
-@RequestMapping("/url")
+@RequestMapping("/redirect/url")
 @RequiredArgsConstructor
 public class UrlRedirectRestController {
 

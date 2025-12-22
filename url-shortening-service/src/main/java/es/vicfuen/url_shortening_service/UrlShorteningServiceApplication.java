@@ -3,6 +3,7 @@ package es.vicfuen.url_shortening_service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
@@ -11,6 +12,7 @@ import org.springframework.context.annotation.ComponentScan;
         "es.vicfuen.url_shortening_service",
         "es.vicfuen.ccassandraCommon"
 })
+@EnableDiscoveryClient
 public class UrlShorteningServiceApplication {
 
     public static void main(String[] args) {
