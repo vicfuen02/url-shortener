@@ -6,31 +6,7 @@ A robust and scalable URL shortener built with Java Spring Boot, following a mic
 
 The system is designed with scalability in mind, separating the write path (Shortening) from the read path (Redirect) to handle high-traffic loads efficiently.
 
-```mermaid
-graph TD
-    Client([Client])
-    Gateway[API Gateway<br>:8080]
-    Eureka[Eureka Server<br>:8761]
-    
-    subgraph Services
-        Shortener[Shortening Service<br>:9090]
-        Redirect[Redirect Service<br>:9091]
-    end
-    
-    subgraph Data
-        Redis[(Redis Cache<br>:6379)]
-        Cassandra[(Cassandra DB<br>:9042)]
-    end
-
-    Client -- Request --> Gateway
-    Gateway -- Discovery --> Eureka
-    Gateway -- /url-shortening-service --> Shortener
-    Gateway -- /url-redirect-service --> Redirect
-
-    Shortener -- Save URL --> Cassandra
-    Redirect -- Check Cache --> Redis
-    Redirect -- Read on Miss --> Cassandra
-```
+![Architecture Diagram](./url_shortener_diagram.png)
 
 ## Tech Stack
 
