@@ -22,16 +22,18 @@ services:
     networks:
       - url-shortener-network
 
-  backend:
-    build:
-      context: ./url-redirect-service
-      dockerfile: Dockerfile
-    container_name: url-redirect-service
-    ports:
-      - 9091:8080
-    depends_on:
-      - db-cassandra
-      - redis
+#  redirect-service:
+#    build:
+#      context: .
+#      dockerfile: ./url-redirect-service/Dockerfile
+#    container_name: url-redirect-service
+#    ports:
+#      - 9091:8080
+#    depends_on:
+#      - db-cassandra
+#      - redis
+#    networks:
+#      - url-shortener-network
 
 volumes:
   db-cassandra-vol:

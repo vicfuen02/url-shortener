@@ -15,12 +15,12 @@ COPY ./url-shortener-cassandra-common/src ./common/src
 COPY ./url-redirect-service/src ./service/src
 
 
-RUN sed -i 's/\r$//' mvnw  \
-    && ./mvnw install -N \
-    && cd common/ && ../mvnw dependency:go-offline -B \
-    && cd common/ && ../mvnw clean package install -DskipTests \
-    && cd service/ && ../mvnw dependency:go-offline -B \
-    && cd service/ && ../mvnw clean package -DskipTests
+RUN sed -i 's/\r$//' mvnw
+RUN ./mvnw install -N
+RUN cd common/ && ../mvnw dependency:go-offline -B \
+    && ../mvnw clean package install -DskipTests
+RUN cd service/ && ../mvnw dependency:go-offline -B \
+    && ../mvnw clean package -DskipTests
 
 
 

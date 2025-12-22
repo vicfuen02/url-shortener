@@ -8,14 +8,14 @@ COPY .mvn .mvn
 RUN chmod +x mvnw
 
 COPY pom.xml .
-COPY ./url-shortener-eureka-api/pom.xml ./service/
-COPY ./url-shortener-eureka-api/src ./service/src
+COPY ./url-shortener-eureka-server/pom.xml ./service/
+COPY ./url-shortener-eureka-server/src ./service/src
 
 
 RUN sed -i 's/\r$//' mvnw  \
     && ./mvnw install -N \
     && cd service/ && ../mvnw dependency:go-offline -B \
-    && cd service/ && ../mvnw clean package -DskipTests
+    && ../mvnw clean package -DskipTests
 
 
 
@@ -23,8 +23,8 @@ FROM eclipse-temurin:25-jre-alpine
 
 WORKDIR /home/app
 
-COPY --from=builder /home/app/service/target/url-shortener-eureka-api-*.jar url-shortener-eureka-api.jar
+COPY --from=builder /home/app/service/target/url-shortener-eureka-server-*.jar url-shortener-eureka-server.jar
 
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-jar", "/home/app/url-shortener-eureka-api.jar"]
+ENTRYPOINT ["java", "-jar", "/home/app/url-shortener-eureka-server.jar"]

@@ -15,7 +15,7 @@ COPY ./url-shortener-gateway-api/src ./service/src
 RUN sed -i 's/\r$//' mvnw  \
     && ./mvnw install -N \
     && cd service/ && ../mvnw dependency:go-offline -B \
-    && cd service/ && ../mvnw clean package -DskipTests
+    && ../mvnw clean package -DskipTests
 
 
 
