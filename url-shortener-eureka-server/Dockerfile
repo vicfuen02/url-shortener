@@ -25,6 +25,6 @@ WORKDIR /home/app
 
 COPY --from=builder /home/app/service/target/url-shortener-eureka-server-*.jar url-shortener-eureka-server.jar
 
-EXPOSE 8080
+EXPOSE 8761
 
 ENTRYPOINT ["java", "-jar", "/home/app/url-shortener-eureka-server.jar"]

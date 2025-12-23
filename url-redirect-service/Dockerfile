@@ -30,6 +30,6 @@ WORKDIR /home/app
 
 COPY --from=builder /home/app/service/target/url-redirect-service-*.jar url-redirect-service.jar
 
-EXPOSE 8080
+EXPOSE 9090
 
 ENTRYPOINT ["java", "-jar", "/home/app/url-redirect-service.jar"]

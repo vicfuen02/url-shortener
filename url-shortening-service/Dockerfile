@@ -30,6 +30,6 @@ WORKDIR /home/app
 
 COPY --from=builder /home/app/service/target/url-shortening-service-*.jar url-shortening-service.jar
 
-EXPOSE 8080
+EXPOSE 8090
 
 ENTRYPOINT ["java", "-jar", "/home/app/url-shortening-service.jar"]

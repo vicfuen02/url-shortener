@@ -22,7 +22,7 @@ The system is designed with scalability in mind, separating the write path (Shor
 ### 1. URL Shortening Service
 Responsibility: Generates unique short codes for long URLs.
 *   **Database**: Writes persistent data to **Cassandra**.
-*   **Logic**: Accepts a long URL, hashses it, and saves the mapping.
+*   **Logic**: Accepts a long URL, hashes it, and saves the mapping.
 
 ### 2. URL Redirect Service
 Responsibility: Resolves short codes to original URLs.
@@ -44,14 +44,16 @@ Responsibility: Routing and API composition.
 2.  Start the infrastructure and services using Docker Compose:
 
     ```bash
-    docker-compose up -d --build
+    docker-compose up --build --scale redirect-service=2
     ```
 
     This will start:
     *   Cassandra (9042)
     *   Redis (6379)
-    *   Eureka Server (8461)
-    *   All microservices
+    *   Eureka Server (8761)
+    *   Spring Api Gateway (8080)
+    *   Redirect Service (2 instances)
+    *   Shortening Service
 
 3.  Verify services are up in Eureka Dashboard: `http://localhost:8761`
 

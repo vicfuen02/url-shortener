@@ -24,13 +24,6 @@ public class CacheConfig {
 
     @Bean
     public RedisCacheConfiguration cacheConfiguration() {
-//        ObjectMapper mapper = JsonMapper.builder()
-//                .activateDefaultTyping(
-//                        BasicPolymorphicTypeValidator.builder().build(),
-//                        DefaultTyping.JAVA_LANG_OBJECT,
-//                        JsonTypeInfo.As.PROPERTY
-//                )
-//                .build();
 
         return RedisCacheConfiguration.defaultCacheConfig()
                 .entryTtl(Duration.ofMinutes(1))
