@@ -1,86 +1,104 @@
-# URL Shortener Microservices
+# High-Performance Distributed URL Shortener
 
-A robust and scalable URL shortener built with Java Spring Boot, following a microservices architecture. It uses **Apache Cassandra** for high-volume storage and **Redis** for high-performance caching.
+A robust and scalable URL shortener built with **Java 25** and **Spring Boot 4**, designed to handle high loads using a microservices architecture. It leverages **Apache Cassandra** for highly availability and **Redis** for ultra-fast read performance.
 
 ## Architecture
 
-The system is designed with scalability in mind, separating the write path (Shortening) from the read path (Redirect) to handle high-traffic loads efficiently.
+The system follows a separation of concerns principle, splitting the "Write" (Shortening) and "Read" (Redirect) paths to optimize for different performance characteristics.
 
 ![Architecture Diagram](./url_shortener_diagram.png)
 
-## Tech Stack
+## Tech Stack & Features
 
-*   **Java 25** & **Spring Boot 4**
-*   **Spring Cloud Gateway**: Central entry point for routing and load balancing.
-*   **Netflix Eureka**: Service Registry and Discovery.
-*   **Apache Cassandra**: NoSQL for high-volume storage and high-performance read scalability.
-*   **Redis**: In-memory data structure store used as a cache to minimize database reads.
-*   **Docker & Docker Compose**: Containerized environment for easy deployment.
+*   **Java 25** & **Spring Boot 4**: Built on the latest cutting-edge Java ecosystem.
+*   **Spring Cloud Gateway**: Acts as the single entry point, handling routing and load balancing.
+*   **Netflix Eureka**: Provides dynamic service discovery and registration.
+*   **Apache Cassandra**: Distributed NoSQL database chosen for its high availability and write performance.
+*   **Redis**: In-memory data store acting as a high-speed cache to ensure low-latency redirects.
+*   **Docker Compose**: Fully containerized environment supporting replica scaling.
 
-## Microservices Breakdown
+## Service Details
 
-### 1. URL Shortening Service
-Responsibility: Generates unique short codes for long URLs.
-*   **Database**: Writes persistent data to **Cassandra**.
-*   **Logic**: Accepts a long URL, hashses it, and saves the mapping.
+### 1. URL Shortening Service (Write Path)
+*   **Responsibility**: Generates unique short codes for long URLs.
+*   **Hashing Algorithm**: Uses **SHA-256** to hash the original URL, followed by **Base62** encoding.
+    *   *Why this approach?* SHA-256 ensures a secure and uniform distribution of hash values, reducing collision probabilities. Base62 encoding condenses this hash into a short, URL-friendly alphanumeric string.
+*   **Storage**: Persists the `[Short Code] -> [Long URL]` mapping in **Cassandra**.
 
-### 2. URL Redirect Service
-Responsibility: Resolves short codes to original URLs.
-*   **Caching Strategy**: **Read-Through**. It first checks **Redis**. If the key exists, it redirects immediately. If not, it fetches from **Cassandra**, populates Redis, and then redirects.
+### 2. URL Redirect Service (Read Path)
+*   **Responsibility**: Resolves short codes and redirects users.
+*   **Performance Strategy**: Implements a **Read-Through Caching** pattern.
+    1.  **Cache Hit**: Checks **Redis** first. If found, returns the URL immediately (sub-millisecond latency).
+    2.  **Cache Miss**: If not in Redis, queries **Cassandra**, updates the Redis cache for future requests, and then proceeds.
+*   **Scalability**: Stateless service design allows for horizontal scaling (e.g., running multiple instances) to handle read spikes.
 
-### 3. API Gateway
-Responsibility: Routing and API composition.
-*   **Discovery**: Automatically discovers routes from Eureka.
+### 3. API Gateway & Discovery
+*   **Gateway**: Routes requests to the appropriate service (`/url/shorten` -> Shortening Service, `/url/{code}` -> Redirect Service).
+*   **Eureka**: Services register themselves upon startup, allowing the Gateway to dynamically discover and load-balance requests.
 
 ## Getting Started
 
 ### Prerequisites
-*   **Docker** and **Docker Compose** installed.
-*   **Java 25**.
+
+*   **Docker** installed.
+*   **Java 25** (if running locally without Docker).
 
 ### Installation & Running
 
-1.  Clone the repository.
-2.  Start the infrastructure and services using Docker Compose:
-
+1.  **Clone the repository**:
     ```bash
-    docker-compose up -d --build
+    git clone <repository-url>
+    cd url-shortener
     ```
 
-    This will start:
-    *   Cassandra (9042)
-    *   Redis (6379)
-    *   Eureka Server (8461)
-    *   All microservices
+2.  **Start the infrastructure**:
+    Use Docker Compose to spin up the entire stack. We scale the redirect service to 2 instances to demonstrate load balancing:
+    ```bash
+    docker-compose up --build --scale redirect-service=2
+    ```
 
-3.  Verify services are up in Eureka Dashboard: `http://localhost:8761`
+    **Services started:**
+    *   `db-cassandra` (Port 9042)
+    *   `url-redis` (Port 6379)
+    *   `url-eureka-server` (Port 8761)
+    *   `url-gateway-api` (Port 8080)
+    *   `redirect-service` (2 instances, internal ports)
+    *   `shortening-service` (Port 8090)
+
+3.  **Verify Status**:
+    *   Access Eureka Dashboard to see registered services: `http://localhost:8761`
 
 ## API Usage
 
-All requests should be sent to the **API Gateway** at `http://localhost:8080`.
+All API requests should be routed through the **API Gateway** at `http://localhost:8080`.
 
 ### 1. Shorten a URL
-Create a short link for a long URL.
+Generates a short code for a provided long URL.
 
-*   **Endpoint**: `POST /url/shorten`
+*   **URL**: `/url/shorten`
+*   **Method**: `POST`
+*   **Content-Type**: `application/json`
 *   **Body**:
     ```json
     {
       "url": "https://www.google.com/search?q=spring+boot+microservices"
     }
     ```
-*   **Response**:
+*   **Success Response (200 OK)**:
     ```json
     {
       "url": "https://www.google.com/search?q=spring+boot+microservices",
-      "shortUrl": "a7B2x"
+      "shortUrl": "a7B2xGh"
     }
     ```
 
 ### 2. Redirect
-Access the original URL using the short code.
+Access the original URL using the generated short code.
 
-*   **Endpoint**: `GET /url/{shortCode}`
-*   **Example**: `http://localhost:8080/url/a7B2x`
-*   **Behavior**: Returns `302 Found` and redirects to the original "long" URL.
-
+*   **URL**: `/url/{shortCode}`
+*   **Method**: `GET`
+*   **Example**: `http://localhost:8080/url/a7B2xGh`
+*   **Behavior**:
+    *   Server responds with `302 Found`.
+    *   `Location` header contains the original long URL.
+    *   Browser automatically navigates to the destination.

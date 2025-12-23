@@ -4,17 +4,23 @@ services:
     image: cassandra:5.0.6
     container_name: url-shortener-db-cassandra
     environment:
-      CASSANDRA_USER: admin
-      CASSANDRA_PASSWORD: admin
+#      CASSANDRA_USER: admin
+#      CASSANDRA_PASSWORD: admin
       CASSANDRA_DB: urlShortenerDB
     ports:
       - "9042:9042"
     volumes:
       - db-cassandra-vol:/var/lib/cassandra/data
+    healthcheck:
+      test: ["CMD-SHELL", "cqlsh localhost 9042 -e 'describe keyspaces'"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 40s
     networks:
       - url-shortener-network
 
-  redis:
+  url-redis:
     image: redis:8.4.0
     container_name: url-shortener-redis
     ports:
@@ -22,9 +28,70 @@ services:
     networks:
       - url-shortener-network
 
+
+
+  url-eureka-server:
+    build:
+      context: .
+      dockerfile: ./url-shortener-eureka-server/Dockerfile
+    container_name: url-eureka-server
+    ports:
+      - 8761:8761
+    networks:
+      - url-shortener-network
+
+  url-gateway-api:
+    build:
+      context: .
+      dockerfile: ./url-shortener-gateway-api/Dockerfile
+    container_name: url-gateway-api
+    ports:
+      - 8080:8080
+    environment:
+      EUREKA_SERVER_URL: http://url-eureka-server:8761/eureka/
+    networks:
+      - url-shortener-network
+
+  redirect-service:
+    build:
+      context: .
+      dockerfile: ./url-redirect-service/Dockerfile
+#    container_name: url-redirect-service
+    ports:
+      - 9090-9095:9090
+    environment:
+      CASSANDRA_CONTACT_POINT: db-cassandra
+      REDIS_HOST: url-redis
+      EUREKA_SERVER_URL: http://url-eureka-server:8761/eureka/
+    depends_on:
+      db-cassandra:
+        condition: service_healthy
+      url-redis:
+        condition: service_started
+    networks:
+      - url-shortener-network
+
+  shortening-service:
+    build:
+      context: .
+      dockerfile: ./url-shortening-service/Dockerfile
+    container_name: url-shortening-service
+    ports:
+      - 8090:8090
+    environment:
+      CASSANDRA_CONTACT_POINT: db-cassandra
+      REDIS_HOST: url-redis
+      EUREKA_SERVER_URL: http://url-eureka-server:8761/eureka/
+    depends_on:
+      db-cassandra:
+        condition: service_healthy
+      url-redis:
+        condition: service_started
+    networks:
+      - url-shortener-network
+
 volumes:
   db-cassandra-vol:
-
 
 networks:
   url-shortener-network:

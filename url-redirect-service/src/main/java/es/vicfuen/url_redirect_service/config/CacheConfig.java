@@ -1,9 +1,8 @@
 package es.vicfuen.url_redirect_service.config;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.databind.ObjectMapper;
+//import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.PolymorphicTypeValidator;
-import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,7 +11,10 @@ import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSeriali
 import org.springframework.data.redis.serializer.GenericJacksonJsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import tools.jackson.databind.DefaultTyping;
+import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
+import tools.jackson.databind.jsontype.DefaultBaseTypeLimitingValidator;
 
 import java.time.Duration;
 
@@ -20,35 +22,18 @@ import java.time.Duration;
 @EnableCaching
 public class CacheConfig {
 
-
-//    @Bean
-//    public ObjectMapper redisObjectMapper() {
-//        ObjectMapper mapper = JsonMapper.builder()
-//                .activateDefaultTyping(
-//                        ObjectMapper.getPolymorphicTypeValidator(),
-//                        DefaultTyping.NON_FINAL,
-//                        JsonTypeInfo.As.PROPERTY
-//                )
-//        return mapper;
-//    }
-
     @Bean
     public RedisCacheConfiguration cacheConfiguration() {
-//        ObjectMapper serializerMapper = objectMapper.copy();
-//        serializerMapper.activateDefaultTyping(
-//                serializerMapper.getPolymorphicTypeValidator(),
-//                ObjectMapper.DefaultTyping.NON_FINAL,
-//                JsonTypeInfo.As.PROPERTY
-//        );
 
         return RedisCacheConfiguration.defaultCacheConfig()
-                .entryTtl(Duration.ofMinutes(10))
+                .entryTtl(Duration.ofMinutes(1))
                 .disableCachingNullValues()
                 .serializeValuesWith(
                         RedisSerializationContext.SerializationPair.fromSerializer(
                                 new GenericJackson2JsonRedisSerializer()
                         )
-                );
+                )
+                ;
     }
 
 }
